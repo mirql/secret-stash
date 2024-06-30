@@ -27,7 +27,7 @@ Clone the repository:
 
 ```sh
 git clone https://github.com/mirql/secret-stash.git
-cd SecretStash
+cd secret-stash
 ```
 
 ### Usage 📘
@@ -70,6 +70,23 @@ Update the list of recipients who can decrypt the keyfile. Modify the `plain/rec
 
 - To change the list of recipients who can decrypt the keyfile, modify the `plain/recipients.txt` file and run the `update-recipients` command.
 - SecretStash prefers `ed25519` keys over `rsa` keys. If you don't have `ed25519` keys, make sure to generate them for maximum security!
+
+## Using SecretStash with Git 🗃️
+
+To keep your decrypted files out of your Git repository, add the `plain` directory to your `.gitignore` file. This way, only the encrypted files will be tracked.
+
+1. Create or modify the `.gitignore` file in your repository:
+   ```sh
+   echo "plain/" >> .gitignore
+   ```
+
+2. Ensure that you have the `encrypted` directory and `gocryptfs.key.age` file in your repository:
+   ```sh
+   git add encrypted gocryptfs.key.age
+   git commit -m "Add SecretStash setup"
+   ```
+
+By doing this, you ensure that your sensitive files remain secure and encrypted in your repository.
 
 ## Contributing 🤝
 
