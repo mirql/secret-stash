@@ -13,6 +13,7 @@ help:
 	@echo "  open:               Decrypt the keyfile and mount the encrypted directory"
 	@echo "  close:              Unmount the encrypted directory"
 	@echo "  update-recipients:  Update the recipients of the encrypted directory"
+	@echo "  update-justfile:    Redownload the justfile from the given URL"
 	@echo ""
 	@echo "Note: To change the list of recipients who can decrypt the keyfile, modify the \"{{ENCRYPTED_RECIPIENTS_FILE}}\" file and run the update-recipients command."
 
@@ -49,3 +50,8 @@ update-recipients:
 	age -R {{ENCRYPTED_RECIPIENTS_FILE}} -a -o {{ENCRYPTED_KEYFILE}} && \
 	echo "Recipients updated successfully" || \
 	echo "Recipients update error"
+
+update-justfile:
+	curl -O https://raw.githubusercontent.com/mirql/secret-stash/main/justfile && \
+	echo "justfile updated successfully" || \
+	echo "justfile update error"
