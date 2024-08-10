@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+ENCRYPTED_KEYFILE="gocryptfs.key.age"
+ENCRYPTED_DIR="encrypted"
+PLAIN_DIR="plain"
+
+if [ -f ~/.ssh/id_ed25519 ]; then
+	USER_PRIVATE_KEY=~/.ssh/id_ed25519
+else
+	USER_PRIVATE_KEY=~/.ssh/id_rsa
+fi
+
+echo "Mounting the encrypted directory..."
+mkdir -p "$PLAIN_DIR"
+if age -d -i "$USER_PRIVATE_KEY" -o - "$ENCRYPTED_KEYFILE" | gocryptfs "$ENCRYPTED_DIR" "$PLAIN_DIR"; then
+	echo -e "\nMounted successfully"
+else
+	echo -e "\nMounting error"
+fi

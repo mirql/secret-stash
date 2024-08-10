@@ -1,0 +1,15 @@
+#!/bin/bash
+
+ENCRYPTED_KEYFILE="gocryptfs.key.age"
+PLAIN_DIR="plain"
+ENCRYPTED_RECIPIENTS_FILE="${PLAIN_DIR}/recipients.txt"
+USER_PRIVATE_KEY=$(if [ -f ~/.ssh/id_ed25519 ]; then echo ~/.ssh/id_ed25519; else echo ~/.ssh/id_rsa; fi)
+
+echo "Updating recipients..."
+if cat "${ENCRYPTED_KEYFILE}" |
+	age -d -i "${USER_PRIVATE_KEY}" -o - |
+	age -R "${ENCRYPTED_RECIPIENTS_FILE}" -a -o "${ENCRYPTED_KEYFILE}"; then
+	echo "Recipients updated successfully"
+else
+	echo "Recipients update error"
+fi

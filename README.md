@@ -1,4 +1,14 @@
-# 🛡️ SecretStash 🛡️
+# 🛡 SecretStash 🛡
+
+**DEV BRANCH**
+
+- [ ] Reverse mode
+- [ ] Justfile/bash scripts/other clients
+- [ ] Dotenv support
+- Misc
+  - [ ] Multiple secret direcotries
+
+---
 
 Welcome to **SecretStash** - your ultimate solution for securely encrypting, decrypting, and managing your sensitive files with ease!
 
@@ -71,7 +81,7 @@ Update the list of recipients who can decrypt the keyfile. Modify the `plain/rec
 - To change the list of recipients who can decrypt the keyfile, modify the `plain/recipients.txt` file and run the `update-recipients` command.
 - SecretStash prefers `ed25519` keys over `rsa` keys. If you don't have `ed25519` keys, make sure to generate them for maximum security!
 
-## Using SecretStash with Git 🗃️
+## Using SecretStash with Git 🗃
 
 To keep your decrypted files out of your Git repository, add the `plain` directory to your `.gitignore` file. This way, only the encrypted files will be tracked.
 

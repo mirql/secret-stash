@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+PLAIN_DIR="plain"
+
+echo "Unmounting the encrypted directory..."
+if fusermount -u "$PLAIN_DIR"; then
+	echo "Unmounted successfully"
+else
+	echo "Unmount error"
+fi
