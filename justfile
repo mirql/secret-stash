@@ -2,6 +2,7 @@ KEYFILE := "gocryptfs.key"
 ENCRYPTED_KEYFILE := "gocryptfs.key.age"
 ENCRYPTED_DIR := "encrypted"
 PLAIN_DIR := "plain"
+REVERSE_CONFIG_FILE := ENCRYPTED_DIR + "/gocryptfs-reverse.conf"
 ENCRYPTED_RECIPIENTS_FILE := PLAIN_DIR + "/recipients.txt"
 USER_PRIVATE_KEY := `if [ -f ~/.ssh/id_ed25519 ]; then echo ~/.ssh/id_ed25519; else echo ~/.ssh/id_rsa; fi`
 USER_PUBLIC_KEY := `if [ -f ~/.ssh/id_ed25519.pub ]; then echo ~/.ssh/id_ed25519.pub; else echo ~/.ssh/id_rsa.pub; fi`
@@ -30,6 +31,19 @@ init:
 	echo -e "You can check the list of recipients who can decrypt it in \"{{ENCRYPTED_RECIPIENTS_FILE}}\"" || \
 	echo -e "\nFailed to decrypt the keyfile"
 
+init-reverse:
+	@echo "Initializing encrypted directory and creating keyfile..."
+	mkdir -p {{ENCRYPTED_DIR}} {{PLAIN_DIR}}
+	dd if=/dev/urandom bs=32 count=1 of={{KEYFILE}}
+	gocryptfs -reverse -config {{REVERSE_CONFIG_FILE}} -init {{PLAIN_DIR}} -passfile {{KEYFILE}} && \
+	age -R {{USER_PUBLIC_KEY}} -a -o {{ENCRYPTED_KEYFILE}} {{KEYFILE}} && \
+	rm -f {{KEYFILE}} && \
+	age -d -i {{USER_PRIVATE_KEY}} -o - {{ENCRYPTED_KEYFILE}} | gocryptfs -config {{REVERSE_CONFIG_FILE}} -reverse {{PLAIN_DIR}} {{ENCRYPTED_DIR}}  && \
+	cat {{USER_PUBLIC_KEY}} > {{ENCRYPTED_RECIPIENTS_FILE}} && \
+	echo -e "\nDecrypted folder mounted to \"{{PLAIN_DIR}}\"" && \
+	echo -e "You can check the list of recipients who can decrypt it in \"{{ENCRYPTED_RECIPIENTS_FILE}}\"" || \
+	echo -e "\nFailed to decrypt the keyfile"
+
 open:
 	@echo "Mounting the encrypted directory..."
 	mkdir -p {{PLAIN_DIR}}
@@ -37,9 +51,22 @@ open:
 	echo -e "\nMounted successfully" || \
 	echo -e "\nMounting error"
 
+open-reverse:
+	@echo "Mounting the encrypted directory..."
+	mkdir -p {{ENCRYPTED_DIR}}
+	age -d -i {{USER_PRIVATE_KEY}} -o - {{ENCRYPTED_KEYFILE}} | gocryptfs -config {{REVERSE_CONFIG_FILE}} -reverse {{PLAIN_DIR}} {{ENCRYPTED_DIR}} && \
+	echo -e "\nMounted successfully" || \
+	echo -e "\nMounting error"
+
 close:
 	@echo "Unmounting the encrypted directory..."
 	fusermount -u {{PLAIN_DIR}} && \
+	echo "Unmounted successfully" || \
+	echo "Unmount error"
+
+close-reverse:
+	@echo "Unmounting the encrypted directory..."
+	fusermount -u {{ENCRYPTED_DIR}} && \
 	echo "Unmounted successfully" || \
 	echo "Unmount error"
 
